@@ -6,6 +6,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -58,9 +59,11 @@ public class App {
 				return false;
 			} else {
 				PrintWriter p = new PrintWriter(f);
-				for (String str : data) {
-					p.write(str + "\n");
+				p.write("[");
+				for (int i = 0; i < data.size() - 1; i++) {
+					p.write(data.get(i) + ",\n");
 				}
+				p.write(data.get(data.size() - 1) + "]\n");
 				p.close();
 				return true;
 			}
@@ -70,15 +73,19 @@ public class App {
 		return false;
 	}
 
+	// Retrieve Youtube's trending videos information and output to JSON in a list.
 	public static ArrayList<String> getTrendingData(String url) {
-		Gson g = new Gson();
-
+		GsonBuilder gs = new GsonBuilder();
+		gs.disableHtmlEscaping();
+		Gson g = gs.create();
+		
 		ArrayList<String> list = new ArrayList<String>();
 		
 		try {
 			URL html = new URL(url);
 			Document doc = Jsoup.parse(html, 10000);
 			Elements feeds = doc.select(".yt-lockup-content");
+			// For each video
 			for (Element element : feeds) {
 				String title = (element.select("a").attr("title")); //Video Title
 				String author = (element.select(".yt-lockup-byline").text()); // Uploader
@@ -94,10 +101,18 @@ public class App {
 		}
 	}
 	
+	// Extract offset date from the string
 	public static long getDate(String str) {
 		// Get the units
+		String timeText = "";
 		int indexAgo = str.indexOf(" ago");
-		String timeText = str.substring(0, indexAgo).toLowerCase(); // Remove ago		
+		int indexViews = str.indexOf("views");
+		// Cut off time ago
+		if (indexAgo < indexViews) {
+			timeText = str.substring(0, indexAgo);
+		} else {
+			timeText = str.substring(indexViews);
+		}
 		timeText = timeText.replaceAll("[^0-9]", ""); //Only numbers
 		long units = Long.parseLong(timeText);
 		
@@ -123,18 +138,27 @@ public class App {
 		return epoch;
 	}
 	
+	// Extract view count from the string
 	public static int getViews(String str) {
-		int index = str.indexOf("ago ");
-		String viewText = str.substring(index + 4); // Remove days/weeks ago
+		String viewText = "";
+		int indexAgo = str.indexOf("ago");
+		int indexViews = str.indexOf("views");
+		// Cut off the views
+		if (indexViews < indexAgo) {
+			viewText = str.substring(0, indexViews);
+		} else {
+			viewText = str.substring(indexAgo);
+		}
 		viewText = viewText.replaceAll("[^0-9]", ""); // Only numbers
 		return Integer.parseInt(viewText);
 	}
 
 	public static void main(String[] args) {
 		ArrayList<String> jsons = getTrendingData("https://www.youtube.com/feed/trending");
+		writeListToFile(jsons, "trendingvideos.json");
 
-		for (String s : jsons) {
-			System.out.println(s);
-		}
+//		for (String s : jsons) {
+//			System.out.println(s);
+//		}
 	}
 }
