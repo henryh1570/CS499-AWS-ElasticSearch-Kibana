@@ -91,8 +91,9 @@ public class App {
 				String author = (element.select(".yt-lockup-byline").text()); // Uploader
 				String dateViews = (element.select(".yt-lockup-meta-info").text()); // Date + view count
 				int views = getViews(dateViews);
-				long date = getDate(dateViews);
-				list.add(g.toJson(new Video(title, author, views, date)));
+				String date = getDate(dateViews);
+				long id = getId(title, author);
+				list.add(g.toJson(new Video(title, author, views, date, id)));
 			}			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -102,7 +103,7 @@ public class App {
 	}
 	
 	// Extract offset date from the string
-	public static long getDate(String str) {
+	public static String getDate(String str) {
 		// Get the units
 		String timeText = "";
 		int indexAgo = str.indexOf(" ago");
@@ -132,10 +133,18 @@ public class App {
 			ldt = ldt.minusYears(units);
 		}
 		
-		// Return the epoch version
+		// Return the basic date version
 		ZoneId zoneId = ZoneId.systemDefault();
-		long epoch = ldt.atZone(zoneId).toEpochSecond();
-		return epoch;
+		String year = ""+ldt.atZone(zoneId).getYear();
+		String month = ""+ldt.atZone(zoneId).getMonthValue();
+		String day = ""+ldt.atZone(zoneId).getDayOfMonth();
+		if (month.length() == 1) {
+			month = "0" + month;
+		}
+		if (day.length() == 1) {
+			day = "0" + day;
+		}
+		return (year + month + day);
 	}
 	
 	// Extract view count from the string
@@ -152,13 +161,20 @@ public class App {
 		viewText = viewText.replaceAll("[^0-9]", ""); // Only numbers
 		return Integer.parseInt(viewText);
 	}
+	
+	// Unique hash for video id using title + author
+	public static long getId(String title, String author) {
+		long hash = author.charAt(0) + title.charAt(0);
+		for (int i = 0; i < title.length(); i++) {
+			for (int j = 0; j < author.length(); j++) {
+				hash = hash + author.charAt(j) * title.charAt(i);
+			}
+		}
+		return hash;
+	}
 
 	public static void main(String[] args) {
 		ArrayList<String> jsons = getTrendingData("https://www.youtube.com/feed/trending");
 		writeListToFile(jsons, "trendingvideos.json");
-
-//		for (String s : jsons) {
-//			System.out.println(s);
-//		}
 	}
 }

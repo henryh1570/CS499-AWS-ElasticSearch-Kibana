@@ -18,7 +18,7 @@ client.ping({
 });
 
 function loadDataSet() {
-    fs.readFile("trendingvideos.json", {
+    fs.readFile("../trendingvideos.json", {
         encoding: 'utf-8'
     }, function(err, data) {
         if (!err) {
@@ -26,7 +26,7 @@ function loadDataSet() {
             for (var i = 0; i < items.length; i++) {
                 client.create({
                     index: indexName,
-                    id: i,
+                    id: items[i].id,
                     type: 'video',
                     body: {
                         title: items[i].title,
@@ -73,7 +73,7 @@ function initMapping() {
                 },
                 date: {
                     type: "date",
-                    format: "epoch_millis"
+                    format: "basic_date"
                 }
             }
         }

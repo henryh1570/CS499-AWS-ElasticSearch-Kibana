@@ -4,13 +4,15 @@ public class Video {
 	private String title;
 	private String author;
 	private int views;
-	private long date;
+	private String date;
+	private long id;
 	
-	public Video(String t, String a, int v, long d) {
+	public Video(String t, String a, int v, String d, long id) {
 		 setTitle(t);
 		 setAuthor(a);
 		 setViews(v);
 		 setDate(d);
+		 setId(id);
 	}
 
 	public String getTitle() {
@@ -37,11 +39,19 @@ public class Video {
 		this.views = views;
 	}
 
-	public long getDate() {
+	public String getDate() {
 		return date;
 	}
 
-	public void setDate(long date) {
+	public void setDate(String date) {
 		this.date = date;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 }
