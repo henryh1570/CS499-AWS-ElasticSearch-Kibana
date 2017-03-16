@@ -1,6 +1,11 @@
 Information
 ===========
 
+My idea for an elasticsearch and kibana application was to simply 
+extract the current video information from youtube's trending section. 
+Information extracted is video Title, uploader, date, views, description, and 
+category. Using kibana I can visualize and seek out trends among these trending videos.
+
 This code is a parser for the current information of youtube's
  trending video section of their dashboard. Running this code 
 will output a file containing info about each video's title, 
