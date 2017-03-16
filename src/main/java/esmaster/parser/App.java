@@ -33,7 +33,7 @@ public class App {
 			p.write(data.get(data.size() - 1) + "]\n");
 			p.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Failed to save to file");
 			return false;
 		}
 		return true;
@@ -44,9 +44,7 @@ public class App {
 		GsonBuilder gs = new GsonBuilder();
 		gs.disableHtmlEscaping();
 		Gson g = gs.create();
-
 		ArrayList<String> list = new ArrayList<String>();
-
 		try {
 			URL html = new URL(url);
 			Document doc = Jsoup.parse(html, 10000);
@@ -64,7 +62,7 @@ public class App {
 				list.add(g.toJson(new Video(title, author, views, date, id, des[0], des[1])));
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Issue with parsing html from link in getting trending data");
 		} finally {
 			return list;
 		}
@@ -81,7 +79,7 @@ public class App {
 			Elements description = doc.select("#eow-description");
 			str[1] = description.get(0).text();
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Issue with retrieving description: " + link);
 			str[0] = "N/A";
 			str[1] = "N/A";
 		} finally {
