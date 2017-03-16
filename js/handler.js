@@ -17,6 +17,7 @@ client.ping({
     }
 });
 
+// Will update existing documents found via id
 function loadDataSet() {
     fs.readFile("../trendingvideos.json", {
         encoding: 'utf-8'
@@ -24,7 +25,7 @@ function loadDataSet() {
         if (!err) {
             var items = JSON.parse(data);
             for (var i = 0; i < items.length; i++) {
-                client.create({
+                client.index({
                     index: indexName,
                     id: items[i].id,
                     type: 'video',
@@ -32,7 +33,9 @@ function loadDataSet() {
                         title: items[i].title,
                         author: items[i].author,
                         views: items[i].views,
-                        date: items[i].date
+                        date: items[i].date,
+                        category: items[i].category,
+                        description: items[i].description
                     }
                 }, function(error, response) {
                     console.log("put item successfully.")
@@ -74,13 +77,19 @@ function initMapping() {
                 date: {
                     type: "date",
                     format: "basic_date"
+                },
+                category: {
+                    type: "keyword"
+                },
+                description: {
+                    type: "string"
                 }
             }
         }
     });
 }
 
+//deleteIndex();
 //makeIndex();
 //initMapping();
-//deleteIndex();
-//loadDataSet();
+loadDataSet();
